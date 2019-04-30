@@ -8,9 +8,16 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId((err, id) => {
+    if(err) {
+      return;
+    } else {
+      var path = `${exports.dataDir}/${id}.txt`;
+      fs.writeFile(path, text, () => {
+        callback(err, { id, text });
+      });
+    }
+  });
 };
 
 exports.readAll = (callback) => {
