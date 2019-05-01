@@ -22,20 +22,26 @@ exports.create = (text, callback) => {
 
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, files) => {
+    var allTodos = [];
     if (err) {
-      return null;
-    } else {
-      var allTodos = _.map(files, (file) => {
-        var name = file.split('.')[0];
-        var todo = {id: name, text: name};
-        return todo;
-      });
       callback(null, allTodos);
+    } else {
+      var count = files.length;
+      if (count > 0) {
+        _.map(files, (file) => {
+          var name = file.split('.')[0];
+          exports.readOne(name, (err, todo) => {
+            allTodos.push(todo);
+            if (count === allTodos.length) {
+              callback(null, allTodos);
+            }
+          });
+        });
+      } else {
+        callback(null, allTodos);
+      }
     }
   });
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
 };
 
 exports.readOne = (id, callback) => {
